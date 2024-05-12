@@ -108,7 +108,7 @@ class Snake:
         self.new_block = True
 
     def play_sound(self):
-        self.crunch_sound.play()
+        self.crunch_sound.play().set_volume(0.4)
         
     def reset(self):
         self.body = [Vector2(5,10),Vector2(4,10),Vector2(3,10)]
