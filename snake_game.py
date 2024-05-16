@@ -124,6 +124,7 @@ class Main:
     def __init__(self):
         self.snake = Snake()
         self.fruit = Fruit()
+        self.game_pause = False
 
     def update(self):
         self.snake.move_snake()
@@ -162,11 +163,8 @@ class Main:
     def draw_grass(self):
         grass_color = (167,209,61)
 
-        if self.snake.direction == Vector2(0,0):
-            # screen.fill((167,209,61))
-            screen_overlay.fill((100,100,100, 70))  # White with 50% transparency
-            # Blit the overlay onto the screen
-            screen.blit(screen_overlay, (0, 0))
+        if self.game_pause:
+            screen.fill((0,0,0))
             
         else:
             for row in range(Window.cell_number):
@@ -203,17 +201,35 @@ class Main:
 
     def main_menu(self):
         while True:
+            # screen_overlay.fill((50,50,50, 70))
+            # screen.blit(screen_overlay, (0, 0))
             Main.draw_text('Main menu', font, (255, 255, 254), screen, 20, 20)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
                 if event.type == KEYDOWN:
-                    if event.key == K_ESCAPE or K_UP or K_RIGHT or K_DOWN:
-                        pygame.quit()
-                        sys.exit()
+                    if event.key == K_ESCAPE:
+                        return False
+                    if event.key == pygame.K_RIGHT:
+                        if main_game.snake.direction.x != -1:
+                            main_game.snake.direction = Vector2(1, 0)
+                            self.game_pause = False
+                            return False
+                    if event.key == pygame.K_DOWN:
+                        if main_game.snake.direction.y != -1:
+                            main_game.snake.direction = Vector2(0, 1)
+                            self.game_pause = False
+                            return False
+                    if event.key == pygame.K_LEFT:
+                        if main_game.snake.direction.x != 1:
+                            main_game.snake.direction = Vector2(-1, 0)
+                            self.game_pause = False
+                            return False
+            screen.fill((175,215,70))
             main_game.draw_elements()
             pygame.display.update()
+            
 
 
 pygame.init()
@@ -237,6 +253,9 @@ while True:
             main_game.update()
         
         if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                main_game.game_pause = True
+                main_game.main_menu()
             if event.key == pygame.K_UP:
                 if main_game.snake.direction.y != 1:
                     main_game.snake.direction = Vector2(0, -1)
