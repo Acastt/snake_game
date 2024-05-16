@@ -1,6 +1,12 @@
 import sys, pygame, random
 from pygame.math import Vector2
 from settings import Window
+from pygame.locals import *
+
+pygame.init()
+
+font = pygame.font.SysFont(None, 20)
+pygame.display.set_caption('Snake Game')
 
 class Fruit:
     def __init__(self):
@@ -113,7 +119,6 @@ class Snake:
     def reset(self):
         self.body = [Vector2(5,10),Vector2(4,10),Vector2(3,10)]
         self.direction = Vector2(0,0)
-        
 
 class Main:
     def __init__(self):
@@ -144,6 +149,7 @@ class Main:
     def check_fail(self):
         if not 0 <= self.snake.body[0].x < Window.cell_number or not 0 <= self.snake.body[0].y < Window.cell_number:
             self.game_over()
+            self.main_menu()
 
         for block in self.snake.body[1:]:
             if block == self.snake.body[0]:
@@ -155,18 +161,25 @@ class Main:
 
     def draw_grass(self):
         grass_color = (167,209,61)
-          
-        for row in range(Window.cell_number):
-            if row % 2 == 0: 
-                for col in range(Window.cell_number):
-                    if col % 2 == 0:
-                        grass_rect = pygame.Rect(col * Window.cell_size,row * Window.cell_size,Window.cell_size,Window.cell_size)
-                        pygame.draw.rect(screen,grass_color,grass_rect)
-            else:
-                for col in range(Window.cell_number):
-                    if col % 2 != 0:
-                        grass_rect = pygame.Rect(col * Window.cell_size,row * Window.cell_size,Window.cell_size,Window.cell_size)
-                        pygame.draw.rect(screen,grass_color,grass_rect)	
+
+        if self.snake.direction == Vector2(0,0):
+            # screen.fill((167,209,61))
+            screen_overlay.fill((100,100,100, 70))  # White with 50% transparency
+            # Blit the overlay onto the screen
+            screen.blit(screen_overlay, (0, 0))
+            
+        else:
+            for row in range(Window.cell_number):
+                if row % 2 == 0: 
+                    for col in range(Window.cell_number):
+                        if col % 2 == 0:
+                            grass_rect = pygame.Rect(col * Window.cell_size,row * Window.cell_size,Window.cell_size,Window.cell_size)
+                            pygame.draw.rect(screen,grass_color,grass_rect)
+                else:
+                    for col in range(Window.cell_number):
+                        if col % 2 != 0:
+                            grass_rect = pygame.Rect(col * Window.cell_size,row * Window.cell_size,Window.cell_size,Window.cell_size)
+                            pygame.draw.rect(screen,grass_color,grass_rect)	
     
     def draw_score(self):
         score_text = str(len(self.snake.body) - 3)
@@ -182,9 +195,30 @@ class Main:
         screen.blit(apple, apple_rect)
         pygame.draw.rect(screen,(56,74,12), bg_rect,2)
 
+    def draw_text(text, font, color, surface, x, y):
+        text_object = font.render(text, 1, color)
+        text_rect = text_object.get_rect()
+        text_rect.topleft = (x, y)
+        surface.blit(text_object, text_rect)
+
+    def main_menu(self):
+        while True:
+            Main.draw_text('Main menu', font, (255, 255, 254), screen, 20, 20)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == KEYDOWN:
+                    if event.key == K_ESCAPE or K_UP or K_RIGHT or K_DOWN:
+                        pygame.quit()
+                        sys.exit()
+            main_game.draw_elements()
+            pygame.display.update()
+
 
 pygame.init()
 screen = pygame.display.set_mode((Window.width, Window.height))
+screen_overlay = pygame.Surface((Window.width, Window.height), pygame.SRCALPHA)
 clock = pygame.time.Clock()
 apple = pygame.image.load('Graphics/apple/apple.png').convert_alpha()
 game_font = pygame.font.Font('Font/PoetsenOne-Regular.ttf', 25)
@@ -216,7 +250,6 @@ while True:
                 if main_game.snake.direction.x != 1:
                     main_game.snake.direction = Vector2(-1, 0)
 
-        
     screen.fill((175,215,70))
     main_game.draw_elements()
     pygame.display.update()
