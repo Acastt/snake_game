@@ -136,6 +136,12 @@ class Main:
         self.fruit.draw_fruit()
         self.snake.draw_snake()
         self.draw_score()
+        
+    def menu_draw_elements(self):
+        self.draw_grass()
+        self.fruit.draw_fruit()
+        self.snake.draw_snake()
+        self.draw_score()
 
     def check_collision(self):
         if self.fruit.pos == self.snake.body[0]:
@@ -162,22 +168,17 @@ class Main:
 
     def draw_grass(self):
         grass_color = (167,209,61)
-
-        if self.game_pause:
-            screen.fill((0,0,0))
-            
-        else:
-            for row in range(Window.cell_number):
-                if row % 2 == 0: 
-                    for col in range(Window.cell_number):
-                        if col % 2 == 0:
-                            grass_rect = pygame.Rect(col * Window.cell_size,row * Window.cell_size,Window.cell_size,Window.cell_size)
-                            pygame.draw.rect(screen,grass_color,grass_rect)
-                else:
-                    for col in range(Window.cell_number):
-                        if col % 2 != 0:
-                            grass_rect = pygame.Rect(col * Window.cell_size,row * Window.cell_size,Window.cell_size,Window.cell_size)
-                            pygame.draw.rect(screen,grass_color,grass_rect)	
+        for row in range(Window.cell_number):
+            if row % 2 == 0: 
+                for col in range(Window.cell_number):
+                    if col % 2 == 0:
+                        grass_rect = pygame.Rect(col * Window.cell_size,row * Window.cell_size,Window.cell_size,Window.cell_size)
+                        pygame.draw.rect(screen,grass_color,grass_rect)
+            else:
+                for col in range(Window.cell_number):
+                    if col % 2 != 0:
+                        grass_rect = pygame.Rect(col * Window.cell_size,row * Window.cell_size,Window.cell_size,Window.cell_size)
+                        pygame.draw.rect(screen,grass_color,grass_rect)	
     
     def draw_score(self):
         score_text = str(len(self.snake.body) - 3)
@@ -199,18 +200,26 @@ class Main:
         text_rect.topleft = (x, y)
         surface.blit(text_object, text_rect)
 
+    def draw_menu(self):
+        menu_x_y = 20, 20
+        screen.blit(main_menu,menu_x_y)
+        Main.draw_text('Main menu', font, (255, 255, 255), screen, 25, 28)
+
     def main_menu(self):
         while True:
-            # screen_overlay.fill((50,50,50, 70))
-            # screen.blit(screen_overlay, (0, 0))
-            Main.draw_text('Main menu', font, (255, 255, 254), screen, 20, 20)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
+                        main_game.game_pause = False
                         return False
+                    if event.key == pygame.K_UP:
+                        if main_game.snake.direction.y != 1:
+                            main_game.snake.direction = Vector2(0, -1)
+                            self.game_pause = False
+                            return False
                     if event.key == pygame.K_RIGHT:
                         if main_game.snake.direction.x != -1:
                             main_game.snake.direction = Vector2(1, 0)
@@ -226,8 +235,10 @@ class Main:
                             main_game.snake.direction = Vector2(-1, 0)
                             self.game_pause = False
                             return False
-            screen.fill((175,215,70))
-            main_game.draw_elements()
+            main_game.menu_draw_elements()
+            screen_overlay.fill((175,215,70, 128))
+            screen.blit(screen_overlay, (0,0))
+            main_game.draw_menu()            
             pygame.display.update()
             
 
@@ -238,6 +249,8 @@ screen_overlay = pygame.Surface((Window.width, Window.height), pygame.SRCALPHA)
 clock = pygame.time.Clock()
 apple = pygame.image.load('Graphics/apple/apple.png').convert_alpha()
 game_font = pygame.font.Font('Font/PoetsenOne-Regular.ttf', 25)
+main_menu = pygame.image.load('Graphics/menu/main_menu.png').convert_alpha()
+main_menu.set_colorkey((0,0,0))
 
 SCREEN_UPDATE = pygame.USEREVENT
 pygame.time.set_timer(SCREEN_UPDATE, 150)
