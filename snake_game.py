@@ -5,7 +5,7 @@ from pygame.locals import *
 
 pygame.init()
 
-font = pygame.font.SysFont(None, 20)
+font = pygame.font.SysFont(None, 23)
 pygame.display.set_caption('Snake Game')
 
 class Fruit:
@@ -195,7 +195,7 @@ class Main:
         pygame.draw.rect(screen,(56,74,12), bg_rect,2)
 
     def draw_text(text, font, color, surface, x, y):
-        text_object = font.render(text, 1.5, color)
+        text_object = font.render(text, 1, color)
         text_rect = text_object.get_rect()
         text_rect.topleft = (x, y)
         surface.blit(text_object, text_rect)
@@ -352,6 +352,7 @@ m_click = False
 main_game = Main()
 
 while True:
+    fps = clock.get_fps()   
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -387,5 +388,6 @@ while True:
                 resume_rect.center = (100, 240)
     screen.fill((175,215,70))
     main_game.draw_elements()
+    Main.draw_text(f'FPS={fps:.2f}', font, (255, 255, 255), screen, 680, 20)
     pygame.display.update()
     clock.tick(60)
