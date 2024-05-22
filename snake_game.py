@@ -201,46 +201,80 @@ class Main:
         surface.blit(text_object, text_rect)
 
     def draw_menu(self):
-        running = True
-        while running:
-            screen.blit(main_menu,main_menu_rect)
-            screen.blit(options,options_rect)
-            screen.blit(resume, resume_rect)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == KEYDOWN:
-                    if event.key == K_ESCAPE:
-                        main_game.game_pause = False
-                        running = False
-            pygame.display.update()
-            clock.tick(60)
+        
+        screen.blit(main_menu,main_menu_rect)
+        screen.blit(options,options_rect)
+        screen.blit(resume, resume_rect)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    main_game.game_pause = False
+                    main_menu_rect.center = (120, 80)
+                    options_rect.center = (100, 160)
+                    resume_rect.center = (100, 240)
+                    return False
+           
 
 
     def draw_options_menu(self):
         running = True
+        print('menu opçoes')
+        options_rect.center = (120, 80)
+        screen.blit(options,options_rect)
         while running:
-            screen.blit(main_menu,main_menu_rect)
-            print('menu opçoes')
+            m_x, m_y = pygame.mouse.get_pos()
+            m_click = False            
+        # screen.blit(main_menu,main_menu_rect)
+            if main_game.game_pause == False:                
+                return False
+            
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
+                        running = False
+                        main_menu_rect.center = (120, 80)
+                        options_rect.center = (100, 160)
+                        resume_rect.center = (100, 240)
+                if event.type == MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        m_click = True
+                if resume_rect.collidepoint((m_x, m_y)):
+                    if m_click:
+                        running = False
                         main_game.game_pause = False
-                        return False
-        # Main.draw_text('Main menu', font, (255, 255, 255), screen, 25, 28)
+                        print('exit')
+                
+            # Main.draw_text('Main menu', font, (255, 255, 255), screen, 25, 28)
+            screen_overlay.fill((175,215,70, 128))
+            screen.blit(screen_overlay, (0,0))     
+            screen.blit(options,options_rect)
+            screen.blit(video, video_rect)
+            screen.blit(sound, sound_rect)
+            resume_rect.center = (100, 320)
+            screen.blit(resume, resume_rect)
             pygame.display.update()
             clock.tick(60)
-
+            main_game.draw_elements()
 
     def main_menu(self):
         while True:
             
             m_x, m_y = pygame.mouse.get_pos()
-            m_click = False            
+            m_click = False         
+            if main_game.game_pause == False:
+                return False
+            if main_game.game_pause:
+                main_menu_rect.center = (120, 80)
+                options_rect.center = (100, 160)
+                resume_rect.center = (100, 240)
+            
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -248,18 +282,22 @@ class Main:
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         main_game.game_pause = False
+                        main_menu_rect.center = (120, 80)
+                        options_rect.center = (100, 160)
+                        resume_rect.center = (100, 240)
                         return False
                 if event.type == MOUSEBUTTONDOWN:
                     if event.button == 1:
                         m_click = True
-                    
+                
+                
 
-            if main_menu_rect.collidepoint((m_x, m_y)):
-                if m_click:
-                    menu_state = 'main'
-                    m_click =False
-                    main_game.draw_menu()
-
+            # if main_menu_rect.collidepoint((m_x, m_y)):
+            #     if m_click:
+            #         menu_state = 'main'
+            #         m_click =False
+            #         main_game.draw_menu()
+                
             if options_rect.collidepoint((m_x, m_y)):
                 if m_click:
                     menu_state = 'options'
@@ -268,16 +306,18 @@ class Main:
                                 
             if resume_rect.collidepoint((m_x, m_y)):
                 if m_click:
-                    menu_state = 'main'
+                    menu_state = '0'
                     m_click =False
                     print('exit')
                     return False
 
             screen_overlay.fill((175,215,70, 128))
             screen.blit(screen_overlay, (0,0))            
-            pygame.display.update()
             main_game.draw_menu() 
+            pygame.display.update()
+            main_game.draw_elements()
             clock.tick(60)
+        
             
 
 
@@ -287,6 +327,7 @@ screen_overlay = pygame.Surface((Window.width, Window.height), pygame.SRCALPHA)
 clock = pygame.time.Clock()
 apple = pygame.image.load('Graphics/apple/apple.png').convert_alpha()
 game_font = pygame.font.Font('Font/PoetsenOne-Regular.ttf', 25)
+menu_state = '0'
 main_menu = pygame.image.load('Graphics/menu/main_menu.png').convert_alpha()
 main_menu_rect = main_menu.get_rect()
 main_menu_rect.center = (120, 80)
@@ -296,6 +337,12 @@ options_rect.center = (100, 160)
 resume = pygame.image.load('Graphics/menu/resume.png').convert_alpha()
 resume_rect = resume.get_rect()
 resume_rect.center = (100, 240)
+video = pygame.image.load('Graphics/menu/video.png').convert_alpha()
+video_rect = video.get_rect()
+video_rect.center = (100, 160)
+sound = pygame.image.load('Graphics/menu/sound.png').convert_alpha()
+sound_rect = sound.get_rect()
+sound_rect.center = (100, 240)
 
 SCREEN_UPDATE = pygame.USEREVENT
 pygame.time.set_timer(SCREEN_UPDATE, 150)
@@ -305,6 +352,7 @@ m_click = False
 main_game = Main()
 
 while True:
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -314,8 +362,12 @@ while True:
         
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
+                menu_state = 'main'
                 main_game.game_pause = True
                 main_game.main_menu()
+            if event.type == MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        m_click = True
             if event.key == pygame.K_UP:
                 if main_game.snake.direction.y != 1:
                     main_game.snake.direction = Vector2(0, -1)
@@ -329,6 +381,10 @@ while True:
                 if main_game.snake.direction.x != 1:
                     main_game.snake.direction = Vector2(-1, 0)
 
+            if main_game.game_pause == False:
+                main_menu_rect.center = (120, 80)
+                options_rect.center = (100, 160)
+                resume_rect.center = (100, 240)
     screen.fill((175,215,70))
     main_game.draw_elements()
     pygame.display.update()
