@@ -303,6 +303,7 @@ class Main:
                     menu_state = 'options'
                     m_click =False
                     main_game.draw_options_menu()
+                    # FULLSCREEN_TOGGLE
                                 
             if resume_rect.collidepoint((m_x, m_y)):
                 if m_click:
@@ -322,12 +323,27 @@ class Main:
 
 
 pygame.init()
+info = pygame.display.Info()
+print(info)
+# screen_width, screen_height = info.current_w, info.current_h
+# Window.width, Window.height = screen_width - 10, screen_height - 440
+# window_x = (screen_width - Window.width) // 2
+# window_y = (screen_height - Window.height) // 2
+# screen = pygame.display.set_mode((window_x, window_y), pygame.FULLSCREEN)
+# FULLSCREEN_TOGGLE = pygame.display.toggle_fullscreen()
 screen = pygame.display.set_mode((Window.width, Window.height))
 screen_overlay = pygame.Surface((Window.width, Window.height), pygame.SRCALPHA)
+
+
 clock = pygame.time.Clock()
+
+
 apple = pygame.image.load('Graphics/apple/apple.png').convert_alpha()
 game_font = pygame.font.Font('Font/PoetsenOne-Regular.ttf', 25)
+
+
 menu_state = '0'
+
 main_menu = pygame.image.load('Graphics/menu/main_menu.png').convert_alpha()
 main_menu_rect = main_menu.get_rect()
 main_menu_rect.center = (120, 80)
