@@ -331,7 +331,7 @@ print(info)
 # window_y = (screen_height - Window.height) // 2
 # screen = pygame.display.set_mode((window_x, window_y), pygame.FULLSCREEN)
 # FULLSCREEN_TOGGLE = pygame.display.toggle_fullscreen()
-screen = pygame.display.set_mode((Window.width, Window.height))
+screen = pygame.display.set_mode((Window.width, Window.height), pygame.RESIZABLE)
 screen_overlay = pygame.Surface((Window.width, Window.height), pygame.SRCALPHA)
 
 
