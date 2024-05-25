@@ -1,8 +1,9 @@
-import sys, pygame, random
+import sys, pygame, random, os
 from pygame.math import Vector2
 from settings import Window
 from pygame.locals import *
 
+os.environ['SDL_VIDEO_CENTERED'] = '1'
 pygame.init()
 
 font = pygame.font.SysFont(None, 23)
@@ -15,7 +16,6 @@ class Fruit:
     def draw_fruit(self):
         fruit_rect = pygame.Rect(self.pos.x * Window.cell_size, self.pos.y * Window.cell_size, Window.cell_size, Window.cell_size)
         screen.blit(apple, fruit_rect)
-        # pygame.draw.rect(screen, (126, 166, 114), fruit_rect)
 
     def randomize(self):
         self.x = random.randint(0, Window.cell_number - 1)
@@ -125,6 +125,7 @@ class Main:
         self.snake = Snake()
         self.fruit = Fruit()
         self.game_pause = False
+        self.fullscreen_state = False
 
     def update(self):
         self.snake.move_snake()
@@ -156,12 +157,10 @@ class Main:
     def check_fail(self):
         if not 0 <= self.snake.body[0].x < Window.cell_number or not 0 <= self.snake.body[0].y < Window.cell_number:
             self.game_over()
-            # self.main_menu()
 
         for block in self.snake.body[1:]:
             if block == self.snake.body[0]:
                 self.game_over()
-
 
     def game_over(self):
         self.snake.reset()
@@ -200,6 +199,19 @@ class Main:
         text_rect.topleft = (x, y)
         surface.blit(text_object, text_rect)
 
+    def fullscreen(self):
+        info = pygame.display.Info()
+        if not self.fullscreen_state:
+            screen_width, screen_height = info.current_w, info.current_h
+            window_x = (screen_width - Window.width) // 2
+            window_y = (screen_height - Window.height) // 2
+            screen = pygame.display.set_mode((window_x, window_y), pygame.FULLSCREEN)
+            screen_overlay = pygame.Surface((window_x, window_y), pygame.SRCALPHA)
+            print(screen)
+        else:
+            screen = pygame.display.set_mode((Window.width, Window.height))
+            screen_overlay = pygame.Surface((Window.width, Window.height), pygame.SRCALPHA)
+
     def draw_menu(self):
         
         screen.blit(main_menu,main_menu_rect)
@@ -216,19 +228,19 @@ class Main:
                     main_menu_rect.center = (120, 80)
                     options_rect.center = (100, 160)
                     resume_rect.center = (100, 240)
-                    return False
-           
+                    return False          
 
 
     def draw_options_menu(self):
+        global main_game
         running = True
         print('menu opçoes')
         options_rect.center = (120, 80)
         screen.blit(options,options_rect)
         while running:
             m_x, m_y = pygame.mouse.get_pos()
-            m_click = False            
-        # screen.blit(main_menu,main_menu_rect)
+            m_click = False
+
             if main_game.game_pause == False:                
                 return False
             
@@ -242,6 +254,7 @@ class Main:
                         main_menu_rect.center = (120, 80)
                         options_rect.center = (100, 160)
                         resume_rect.center = (100, 240)
+                    
                 if event.type == MOUSEBUTTONDOWN:
                     if event.button == 1:
                         m_click = True
@@ -250,6 +263,13 @@ class Main:
                         running = False
                         main_game.game_pause = False
                         print('exit')
+                    
+                if video_rect.collidepoint((m_x, m_y)):
+                    if m_click:
+                        self.fullscreen()                        
+                        self.fullscreen_state = not self.fullscreen_state
+                        return
+
                 
             # Main.draw_text('Main menu', font, (255, 255, 255), screen, 25, 28)
             screen_overlay.fill((175,215,70, 128))
@@ -259,11 +279,13 @@ class Main:
             screen.blit(sound, sound_rect)
             resume_rect.center = (100, 320)
             screen.blit(resume, resume_rect)
+            
             pygame.display.update()
             clock.tick(60)
             main_game.draw_elements()
 
     def main_menu(self):
+        global main_game
         while True:
             
             m_x, m_y = pygame.mouse.get_pos()
@@ -289,21 +311,12 @@ class Main:
                 if event.type == MOUSEBUTTONDOWN:
                     if event.button == 1:
                         m_click = True
-                
-                
-
-            # if main_menu_rect.collidepoint((m_x, m_y)):
-            #     if m_click:
-            #         menu_state = 'main'
-            #         m_click =False
-            #         main_game.draw_menu()
-                
+                        
             if options_rect.collidepoint((m_x, m_y)):
                 if m_click:
                     menu_state = 'options'
                     m_click =False
-                    main_game.draw_options_menu()
-                    # FULLSCREEN_TOGGLE
+                    main_game.draw_options_menu()                    
                                 
             if resume_rect.collidepoint((m_x, m_y)):
                 if m_click:
@@ -319,19 +332,16 @@ class Main:
             main_game.draw_elements()
             clock.tick(60)
         
-            
-
-
 pygame.init()
 info = pygame.display.Info()
-print(info)
+# print(info)
 # screen_width, screen_height = info.current_w, info.current_h
 # Window.width, Window.height = screen_width - 10, screen_height - 440
 # window_x = (screen_width - Window.width) // 2
 # window_y = (screen_height - Window.height) // 2
 # screen = pygame.display.set_mode((window_x, window_y), pygame.FULLSCREEN)
 # FULLSCREEN_TOGGLE = pygame.display.toggle_fullscreen()
-screen = pygame.display.set_mode((Window.width, Window.height), pygame.RESIZABLE)
+screen = pygame.display.set_mode((Window.width, Window.height))
 screen_overlay = pygame.Surface((Window.width, Window.height), pygame.SRCALPHA)
 
 
@@ -343,6 +353,7 @@ game_font = pygame.font.Font('Font/PoetsenOne-Regular.ttf', 25)
 
 
 menu_state = '0'
+
 
 main_menu = pygame.image.load('Graphics/menu/main_menu.png').convert_alpha()
 main_menu_rect = main_menu.get_rect()
@@ -376,7 +387,7 @@ while True:
             sys.exit()
         if event.type == SCREEN_UPDATE:
             main_game.update()
-        
+
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 menu_state = 'main'
@@ -397,6 +408,12 @@ while True:
             if event.key == pygame.K_LEFT:
                 if main_game.snake.direction.x != 1:
                     main_game.snake.direction = Vector2(-1, 0)
+            if event.key == pygame.K_f:
+                main_game.fullscreen()                        
+                main_game.fullscreen_state = not main_game.fullscreen_state
+            if event.key == pygame.K_q:
+                pygame.quit()
+                sys.exit()
 
             if main_game.game_pause == False:
                 main_menu_rect.center = (120, 80)
@@ -404,6 +421,8 @@ while True:
                 resume_rect.center = (100, 240)
     screen.fill((175,215,70))
     main_game.draw_elements()
-    Main.draw_text(f'FPS={fps:.2f}', font, (255, 255, 255), screen, 680, 20)
+    Main.draw_text(f'FPS = {fps:.2f}', font, (255, 255, 255), screen, 680, 20)
+    Main.draw_text(f'ESC -> Menu', font, (255, 255, 255), screen, 680, 40)
+    Main.draw_text(f'F -> Fullscreen', font, (255, 255, 255), screen, 680, 60)
     pygame.display.update()
     clock.tick(60)
