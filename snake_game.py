@@ -286,6 +286,7 @@ class Main:
             screen.blit(sound, sound_rect)
             resume_rect.center = (100, 320)
             screen.blit(resume, resume_rect)
+            screen.blit
             
             pygame.display.update()
             clock.tick(60)
