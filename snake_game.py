@@ -126,6 +126,13 @@ class Main:
         self.fruit = Fruit()
         self.game_pause = False
         self.fullscreen_state = False
+        self.game_difficulty = 'Normal'
+        self.game_difficulties = '''
+            Difficulties\n
+            Easy      = 4
+            Normal  = 3
+            Hard      = 2
+            XTreme  = ?'''
 
     def update(self):
         self.snake.move_snake()
@@ -308,6 +315,18 @@ class Main:
                         options_rect.center = (100, 160)
                         resume_rect.center = (100, 240)
                         return False
+                    if event.key == pygame.K_1:
+                        pygame.time.set_timer(SCREEN_UPDATE, 50)
+                        main_game.game_difficulty = 'XTREME'
+                    if event.key == pygame.K_2:
+                        pygame.time.set_timer(SCREEN_UPDATE, 100)
+                        main_game.game_difficulty = 'Hard'
+                    if event.key == pygame.K_3:
+                        pygame.time.set_timer(SCREEN_UPDATE, 150)
+                        main_game.game_difficulty = 'Normal'
+                    if event.key == pygame.K_4:
+                        pygame.time.set_timer(SCREEN_UPDATE, 250)
+                        main_game.game_difficulty = 'Easy'
                 if event.type == MOUSEBUTTONDOWN:
                     if event.button == 1:
                         m_click = True
@@ -324,9 +343,13 @@ class Main:
                     m_click =False
                     print('exit')
                     return False
+                
+            
 
             screen_overlay.fill((175,215,70, 128))
             screen.blit(screen_overlay, (0,0))            
+            Main.draw_text(f'{main_game.game_difficulties}', font, (255, 255, 255), screen, 642, 5)
+            Main.draw_text(f'Difficulty = {main_game.game_difficulty}', font, (255, 255, 255), screen, 622,5)
             main_game.draw_menu() 
             pygame.display.update()
             main_game.draw_elements()
@@ -414,15 +437,31 @@ while True:
             if event.key == pygame.K_q:
                 pygame.quit()
                 sys.exit()
+            if event.key == pygame.K_1:
+                pygame.time.set_timer(SCREEN_UPDATE, 50)
+                main_game.game_difficulty = 'XTREME'
+            if event.key == pygame.K_2:
+                pygame.time.set_timer(SCREEN_UPDATE, 100)
+                main_game.game_difficulty = 'Hard'
+            if event.key == pygame.K_3:
+                pygame.time.set_timer(SCREEN_UPDATE, 150)
+                main_game.game_difficulty = 'Normal'
+            if event.key == pygame.K_4:
+                pygame.time.set_timer(SCREEN_UPDATE, 250)
+                main_game.game_difficulty = 'Easy'
+            
+
 
             if main_game.game_pause == False:
                 main_menu_rect.center = (120, 80)
                 options_rect.center = (100, 160)
                 resume_rect.center = (100, 240)
+
     screen.fill((175,215,70))
     main_game.draw_elements()
     Main.draw_text(f'FPS = {fps:.2f}', font, (255, 255, 255), screen, 680, 20)
     Main.draw_text(f'ESC -> Menu', font, (255, 255, 255), screen, 680, 40)
     Main.draw_text(f'F -> Fullscreen', font, (255, 255, 255), screen, 680, 60)
+    Main.draw_text(f'Difficulty = {main_game.game_difficulty}', font, (255, 255, 255), screen, 642,5)
     pygame.display.update()
     clock.tick(60)
