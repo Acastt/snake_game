@@ -2,6 +2,7 @@ import sys, pygame, random, os
 from pygame.math import Vector2
 from settings import Window
 from pygame.locals import *
+from slider import *
 
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 pygame.init()
@@ -114,7 +115,7 @@ class Snake:
         self.new_block = True
 
     def play_sound(self):
-        self.crunch_sound.play().set_volume(0.4)
+        self.crunch_sound.play()
         
     def reset(self):
         self.body = [Vector2(5,10),Vector2(4,10),Vector2(3,10)]
@@ -133,6 +134,10 @@ class Main:
             Normal  = 3
             Hard      = 2
             XTreme  = ?'''
+        self.sound_slider_pos = 100
+        self.slider_width = 200
+        self.slider_height = 20
+        
 
     def update(self):
         self.snake.move_snake()
@@ -220,7 +225,6 @@ class Main:
             screen_overlay = pygame.Surface((Window.width, Window.height), pygame.SRCALPHA)
 
     def draw_menu(self):
-        
         screen.blit(main_menu,main_menu_rect)
         screen.blit(options,options_rect)
         screen.blit(resume, resume_rect)
@@ -244,6 +248,9 @@ class Main:
         print('menu opçoes')
         options_rect.center = (120, 80)
         screen.blit(options,options_rect)
+
+        sound_slider_x, sound_slider_y = 240, 230
+
         while running:
             m_x, m_y = pygame.mouse.get_pos()
             m_click = False
@@ -265,6 +272,12 @@ class Main:
                 if event.type == MOUSEBUTTONDOWN:
                     if event.button == 1:
                         m_click = True
+                    if event.pos[0] > sound_slider_x and event.pos[0] < sound_slider_x + slider_width and event.pos[1] > sound_slider_y and event.pos[1] < sound_slider_y + slider_height:
+                        main_game.sound_slider_pos = event.pos[0] - sound_slider_x
+                        volume = main_game.sound_slider_pos / slider_width
+                        pygame.mixer.music.set_volume(volume)
+                        print(volume)
+
                 if resume_rect.collidepoint((m_x, m_y)):
                     if m_click:
                         running = False
@@ -276,6 +289,10 @@ class Main:
                         self.fullscreen()                        
                         self.fullscreen_state = not self.fullscreen_state
                         return
+                if sound_rect.collidepoint((m_x, m_y)):
+                    pass
+                        
+
 
                 
             # Main.draw_text('Main menu', font, (255, 255, 255), screen, 25, 28)
@@ -284,6 +301,7 @@ class Main:
             screen.blit(options,options_rect)
             screen.blit(video, video_rect)
             screen.blit(sound, sound_rect)
+            draw_slider(screen, sound_slider_x, sound_slider_y, slider_width, slider_height, main_game.sound_slider_pos)
             resume_rect.center = (100, 320)
             screen.blit(resume, resume_rect)
             screen.blit
@@ -328,6 +346,7 @@ class Main:
                     if event.key == pygame.K_4:
                         pygame.time.set_timer(SCREEN_UPDATE, 250)
                         main_game.game_difficulty = 'Easy'
+                    
                 if event.type == MOUSEBUTTONDOWN:
                     if event.button == 1:
                         m_click = True
@@ -335,7 +354,7 @@ class Main:
             if options_rect.collidepoint((m_x, m_y)):
                 if m_click:
                     menu_state = 'options'
-                    m_click =False
+                    m_click = False
                     main_game.draw_options_menu()                    
                                 
             if resume_rect.collidepoint((m_x, m_y)):
@@ -370,6 +389,7 @@ screen_overlay = pygame.Surface((Window.width, Window.height), pygame.SRCALPHA)
 
 
 clock = pygame.time.Clock()
+
 
 
 apple = pygame.image.load('Graphics/apple/apple.png').convert_alpha()
@@ -450,7 +470,7 @@ while True:
             if event.key == pygame.K_4:
                 pygame.time.set_timer(SCREEN_UPDATE, 250)
                 main_game.game_difficulty = 'Easy'
-            
+                
 
 
             if main_game.game_pause == False:

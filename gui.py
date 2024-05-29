@@ -10,16 +10,16 @@ def set_volume(_):
 pygame.init()
 
 # Load your background music file (e.g., 'background_music.mp3')
-pygame.mixer.music.load('Sound/crunch.wav')
+# pygame.mixer.music.load('Sound/crunch.wav')
 
 root = tk.Tk()
 root.title("Volume Slider")
 
 # Create a slider
-volume_slider = ttk.Scale(root, from_=0, to=100, orient='horizontal', command=set_volume)
+volume_slider = ttk.Scale(root, from_=0.0, to=1.0, orient='horizontal', command=set_volume)
 volume_slider.pack(padx=20, pady=10)
 
 # Start playing the background music (loop indefinitely)
-pygame.mixer.music.play(-1)
+# pygame.mixer.music.play(-1)
 
 root.mainloop()
