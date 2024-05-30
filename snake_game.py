@@ -47,6 +47,9 @@ class Snake:
         self.body_br = pygame.image.load('Graphics/snake/body_br.png').convert_alpha()
         self.body_bl = pygame.image.load('Graphics/snake/body_bl.png').convert_alpha()
         self.crunch_sound = pygame.mixer.Sound('Sound/crunch.wav')
+        self.volume = 0.5
+        self.crunch_sound.set_volume(self.volume)
+        
 
     def draw_snake(self):
         self.update_head_graphics()
@@ -116,6 +119,15 @@ class Snake:
 
     def play_sound(self):
         self.crunch_sound.play()
+
+    def get_volume(self):
+        return self.crunch_sound.get_volume()
+        
+
+    def set_volume(self, volume):
+        self.volume = volume
+        self.crunch_sound.set_volume(volume)
+        
         
     def reset(self):
         self.body = [Vector2(5,10),Vector2(4,10),Vector2(3,10)]
@@ -250,6 +262,7 @@ class Main:
         screen.blit(options,options_rect)
 
         sound_slider_x, sound_slider_y = 240, 230
+        sound_slider_drag = False
 
         while running:
             m_x, m_y = pygame.mouse.get_pos()
@@ -268,33 +281,22 @@ class Main:
                         main_menu_rect.center = (120, 80)
                         options_rect.center = (100, 160)
                         resume_rect.center = (100, 240)
-                    
+                        
                 if event.type == MOUSEBUTTONDOWN:
                     if event.button == 1:
                         m_click = True
-                    if event.pos[0] > sound_slider_x and event.pos[0] < sound_slider_x + slider_width and event.pos[1] > sound_slider_y and event.pos[1] < sound_slider_y + slider_height:
-                        main_game.sound_slider_pos = event.pos[0] - sound_slider_x
-                        volume = main_game.sound_slider_pos / slider_width
-                        pygame.mixer.music.set_volume(volume)
-                        print(volume)
+                        if event.pos[0] > sound_slider_x and event.pos[0] < sound_slider_x + slider_width and event.pos[1] > sound_slider_y and event.pos[1] < sound_slider_y + slider_height:
+                            sound_slider_drag = True
 
-                if resume_rect.collidepoint((m_x, m_y)):
-                    if m_click:
-                        running = False
-                        main_game.game_pause = False
-                        print('exit')
-                    
-                if video_rect.collidepoint((m_x, m_y)):
-                    if m_click:
-                        self.fullscreen()                        
-                        self.fullscreen_state = not self.fullscreen_state
-                        return
-                if sound_rect.collidepoint((m_x, m_y)):
-                    pass
-                        
+                if event.type == MOUSEBUTTONUP:
+                    if event.button == 1:
+                        sound_slider_drag = False
 
+            if sound_slider_drag:
+                main_game.sound_slider_pos = max(0, min(m_x - sound_slider_x, slider_width))
+                volume = main_game.sound_slider_pos / slider_width
+                main_game.snake.set_volume(volume)
 
-                
             # Main.draw_text('Main menu', font, (255, 255, 255), screen, 25, 28)
             screen_overlay.fill((175,215,70, 128))
             screen.blit(screen_overlay, (0,0))     
@@ -305,7 +307,7 @@ class Main:
             resume_rect.center = (100, 320)
             screen.blit(resume, resume_rect)
             screen.blit
-            
+                
             pygame.display.update()
             clock.tick(60)
             main_game.draw_elements()
